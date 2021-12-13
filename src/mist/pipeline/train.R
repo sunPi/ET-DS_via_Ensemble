@@ -15,7 +15,7 @@
 Sys.setenv(CUDA="11.1")
 
 #------------------ Requirements, dependencies and libraries
-pkgs <- c('pacman','dplyr','docopt','xgboost', 'data.table', 'ggplot2', 'caret')        # Packages list
+pkgs <- c('pacman','dplyr','docopt','xgboost', 'data.table', 'ggplot2', 'caret', 'igraph', 'DiagrammeR', 'Ckmeans.1d.dp')        # Packages list
 gitpkgs <- "agnesdeng/mixgb"                                                           # GitHub packages list
 
 suppressMessages(if (!require("BiocManager", character.only = TRUE)) {                           #  

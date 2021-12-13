@@ -116,7 +116,8 @@ files <- list(ifile=paste0(paths[4], names$iname),
               sfile=paste0(paths[4], names$sname),
               cfile=paste0(paths[4], names$cname),
               mfile=paste0(paths[4], names$mname))
-files[[4]]
+saveRDS(data[[2]], files[[2]])
+data[[2]]
 i <- 1
 for(n in files){
   saveRDS(data[[i]], files[[i]])
