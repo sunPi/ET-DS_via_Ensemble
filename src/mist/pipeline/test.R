@@ -40,7 +40,7 @@ arguments <- docopt(doc, quoted_args = TRUE, help = TRUE)
 print(arguments)
 
 #------------------Functions
-source("./pipeline/funtions.R")
+source("./pipeline/functions.R")
 
 #------------------ Load dataset and parameters into R environment 
 infolder <- arguments$infolder
