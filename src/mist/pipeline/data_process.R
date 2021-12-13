@@ -13,9 +13,9 @@
 # 1 - Stable Disease (SD): Neither sufficient shrinkage to qualify for PR nor sufficient increase to qualify for PD, taking as reference the smallest sum LD since the treatment started
 
 #--- AUX
-# infolder <- "./outputs/"
-# path     <- "/home/jr429/Documents/UoL/Bioinformatics_MSc/IndependentResearchProject/ET-DS-via-ENSEMBLE-IRP/src/mist-meso-pipe/"
-# setwd(path)
+infolder <- "./outputs/"
+path     <- "/home/jr429/Documents/ET-DS_via_Ensemble/src/mist/"
+setwd(path)
 
 Sys.setenv(CUDA="11.1")
 
@@ -116,9 +116,9 @@ files <- list(ifile=paste0(paths[4], names$iname),
               sfile=paste0(paths[4], names$sname),
               cfile=paste0(paths[4], names$cname),
               mfile=paste0(paths[4], names$mname))
+files[[4]]
 i <- 1
 for(n in files){
-  print(i)
   saveRDS(data[[i]], files[[i]])
   i <- i + 1
 }
