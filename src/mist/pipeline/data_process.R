@@ -68,7 +68,10 @@ names    <- list(iname = "inputs.RDS",
                  sname = "sid.RDS",
                  cname = "dataframe.RDS",
                  mname = "metadata.RDS")
-
+paths <- list(pdf       = paste0(infolder,"pdf/"), 
+              models    = paste0(infolder,"models/"), 
+              m.eval    = paste0(infolder,"models/model_eval/"), 
+              r.objects = paste0(infolder,"r-objects/"))
 
 print(paste0("Project folder path set to: ", wd))
 print(paste0("Preparing patients dataset with ", infolder, " as the folder where slices are generated!"))
@@ -108,11 +111,11 @@ data      <- list(inputs    = inputs,  # List of cleaned data
 #str(x)
 
 #------------------ Save the processed table as an R object to outputs folder
-files <- list(ifile=paste0(infolder, "r-objects/", names$iname),
-              lfile=paste0(infolder, "r-objects/", names$lname),
-              sfile=paste0(infolder, "r-objects/", names$sname),
-              cfile=paste0(infolder, "r-objects/", names$cname),
-              mfile=paste0(infolder, "r-objects/", names$mname))
+files <- list(ifile=paste0(paths[4], names$iname),
+              lfile=paste0(paths[4], names$lname),
+              sfile=paste0(paths[4], names$sname),
+              cfile=paste0(paths[4], names$cname),
+              mfile=paste0(paths[4], names$mname))
 i <- 1
 for(n in files){
   print(i)
