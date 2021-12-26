@@ -27,3 +27,5 @@ Output of the previous script, the model is then loaded via the package function
 How to use the pipeline:
 
 First, clone the **whole** github repository into a local folder then open a linux terminal and run the run_ETDS.sh script.
+
+Not tested on windows - for windows users download everything and run each script seperately.
