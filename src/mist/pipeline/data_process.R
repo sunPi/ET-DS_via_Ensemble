@@ -1,11 +1,11 @@
 #-------------------------------------------------------------------------------
 # Evolutionary Trajectory-Drug Sensitivity via ENSEMBLE Learning Pipeline
 #-------------------------------------------------------------------------------
-# 0   lack		
-# -1	loss -> WE expect this to be  Associated with sensitivity. 	Bridge analogy for  Synthetic lethality as a response. 
-# -2	deletion		
-# 1	  gain		
-# 2	  amplifications		
+# 0   lack
+# -1	loss -> WE expect this to be  Associated with sensitivity. 	Bridge analogy for  Synthetic lethality as a response.
+# -2	deletion
+# 1	  gain
+# 2	  amplifications
 # 3	  upd	-> Unparental  Disomy  (mimics deletion/amplification)	==> SET THIS TO NA and we reduce the number of dimensions to 4
 # 3 - Complete Response (CR): Disappearance of all target lesions
 # 2 - Partial Response (PR): At least a 30% decrease in the sum of the LD of target lesions, taking as reference the baseline sum LD
@@ -13,9 +13,9 @@
 # 1 - Stable Disease (SD): Neither sufficient shrinkage to qualify for PR nor sufficient increase to qualify for PD, taking as reference the smallest sum LD since the treatment started
 
 #--- AUX
-infolder <- "./outputs/"
-path     <- "/home/jr429/Documents/ET-DS_via_Ensemble/src/mist/"
-setwd(path)
+#infolder <- "./outputs/"
+#path     <- "/home/jr429/Documents/ET-DS_via_Ensemble/src/mist/"
+#setwd(path)
 
 Sys.setenv(CUDA="11.1")
 
@@ -59,18 +59,18 @@ print(arguments)
 #------------------ Functions
 source("./pipeline/functions.R")
 
-#------------------ Load dataset and parameters into R environment 
+#------------------ Load dataset and parameters into R environment
 infolder <- arguments$infolder
 path     <- arguments$path
 wd       <- setwd(path)
-names    <- list(iname = "inputs.RDS", 
+names    <- list(iname = "inputs.RDS",
                  lname = "labels.RDS",
                  sname = "sid.RDS",
                  cname = "dataframe.RDS",
                  mname = "metadata.RDS")
-paths <- list(pdf       = paste0(infolder,"pdf/"), 
-              models    = paste0(infolder,"models/"), 
-              m.eval    = paste0(infolder,"models/model_eval/"), 
+paths <- list(pdf       = paste0(infolder,"pdf/"),
+              models    = paste0(infolder,"models/"),
+              m.eval    = paste0(infolder,"models/model_eval/"),
               r.objects = paste0(infolder,"r-objects/"))
 
 print(paste0("Project folder path set to: ", wd))
@@ -85,7 +85,7 @@ geneset   <- colnames(CNV[,grep("^[A-Z]([A-Z]|\\d)+", colnames(CNV))]) # Extract
 paste0("Summary of missing data: ", round(mean(mv),2), " Standard deviation: ", round(sd(mv),2))
 
 o <- c("inputs", "sample", "response")
-inputs    <- sliceDataset(CNV, o[1]) 
+inputs    <- sliceDataset(CNV, o[1])
 sample    <- sliceDataset(CNV, o[2])
 labels    <- sliceDataset(CNV, o[3])
 
@@ -93,8 +93,8 @@ inputs    <- toNumeric(as.data.frame(inputs), o[1])
 labels    <- toNumeric(labels, o[3])
 
 data      <- list(inputs    = inputs,  # List of cleaned data
-                  labels    = labels, 
-                  sample    = sample,  
+                  labels    = labels,
+                  sample    = sample,
                   dataframe = cbind(sample,labels,inputs), # This is the final processed data frame to be used
                   meta.data = list(gene.set = geneset, missing.values = mv)) # Some extra informations
 
