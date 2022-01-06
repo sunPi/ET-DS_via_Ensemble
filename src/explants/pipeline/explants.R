@@ -25,14 +25,14 @@
 # - verbosity: Verbosity of printing messages. Valid values of 0 (silent), 1 (warning), 2 (info), and 3 (debug).
 # - booster [default= gbtree ]Which booster to use. Can be gbtree, gblinear or dart; gbtree and dart use tree based models while gblinear uses linear fun
 #--- AUX variables
-infolder <- "./outputs/"
-epochs            <- 150
-e                 <- 0.3
-gm                <- 0
-md                <- 6
-mcwt              <- 1
-ss                <- 1
-csbt              <- 1
+# infolder <- "./outputs/"
+# epochs            <- 150
+# e                 <- 0.3
+# gm                <- 0
+# md                <- 6
+# mcwt              <- 1
+# ss                <- 1
+# csbt              <- 1
 
 Sys.setenv(CUDA="11.1") # Set global variable CUDA to 11.1 since pytorch and maybe other GPU-capable algorithms support only 11.1 version
 
@@ -61,24 +61,41 @@ library(pacman)
 pacman::p_load(pkgs, install = TRUE, character.only = TRUE)
 pacman::p_loaded()
 
-# "Mesothelial Cancer Cell Line Data Analysis (M.C.Li.D.A.) Pipeline - Data preparation
-# 
-# Usage: MiNST-data-preparation.R --infolder=<folder> 
-# 
-# Options:
-#   -h --help                  Show this screen.
-#   --infolder=<folder>        Folder where the outputs are placed.
-#   --version                  Pipeline Pre-release version
-# "-> doc
-# 
-# arguments <- docopt(doc, quoted_args = TRUE, help = TRUE)
-# print(arguments)
+"Mesothelial Cancer Cell Line Data Analysis (M.C.Li.D.A) Pipeline - Explants
+
+Usage: explants.R --infolder=<folder> --epochs=<value> --max_depth=<value> --eta=<value> --gamma=<value> --colsample_bytree=<value> --min_child_weight=<value> --subsample=<value> --verbose=<value>
+
+Options:
+  -h --help                  Show this screen.
+  --infolder=<folder>        Folder where the outputs are placed.
+  --epochs=<value>           Number of training epochs for the model.
+  --max_depth=<value>
+  --eta=<value>
+  --gamma=<value>
+  --colsample_bytree=<value>
+  --min_child_weight=<value>
+  --subsample=<value>
+  --verbose=<value>          If set to 1 prints all messages.
+  --version                  
+"-> doc
+
+arguments <- docopt(doc, quoted_args = TRUE, help = TRUE)
+print(arguments)
 
 #------------------ Functions
 source("./pipeline/explants_fun.R")
 
 #------------------ Load dataset and parameters into R environment 
-# infolder      <- arguments$infolder
+infolder         <- arguments$infolder
+epochs           <- as.numeric(arguments$epochs)
+md               <- as.numeric(arguments$max_depth)
+e                <- as.numeric(arguments$eta)           
+g                <- as.numeric(arguments$gamma)
+csbt             <- as.numeric(arguments$colsample_bytree)
+mcwt             <- as.numeric(arguments$min_child_weight)
+ss               <- as.numeric(arguments$subsample)   
+verbose          <- as.numeric(arguments$verbose)
+
 files         <- list(cfile = "./datasets/Explants/Clusters.csv",
                       sfile = "./datasets/Explants/Summary.xlsx" )
 
