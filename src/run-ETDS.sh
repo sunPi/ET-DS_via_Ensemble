@@ -12,4 +12,4 @@
 #cd explants
 #sh run-explants.sh
 
-parallel  ::: 'cd mist && chmod u+x run-mist.sh && ./run-mist.sh' 'cd explants && chmod u+x run-explants.sh && ./run-explants.sh'
+parallel  ::: 'cd mist && ./run-mist.sh' 'cd explants && ./run-explants.sh'
