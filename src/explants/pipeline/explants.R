@@ -26,6 +26,7 @@
 # - booster [default= gbtree ]Which booster to use. Can be gbtree, gblinear or dart; gbtree and dart use tree based models while gblinear uses linear fun
 #--- AUX variables
 # infolder <- "./outputs/"
+# path     <- "./home/jr429/Documents/UoL/Bioinformatics_MSc/IndependentResearchProject/ET-DS_via_Ensemble/src/explants"
 # epochs            <- 150
 # e                 <- 0.3
 # gm                <- 0
@@ -36,16 +37,13 @@
 
 Sys.setenv(CUDA="11.1") # Set global variable CUDA to 11.1 since pytorch and maybe other GPU-capable algorithms support only 11.1 version
 
-# Set working directory to where the script is located
-wd <- dirname(rstudioapi::getSourceEditorContext()$path)
-setwd(wd)
 #------------------ Requirements, dependencies and libraries
 pkgs <- c('pacman','RMySQL','docopt','dplyr','xgboost', 'pacman', 'data.table','caret','ggplot2','tidyr','stringr')
 
 suppressMessages(if (!require("BiocManager", character.only = TRUE)) {
   install.packages("BiocManager")
   BiocManager::install()
-} else {
+  } else {
   ipkgs <- sapply(pkgs, function(...) require(..., character.only = TRUE))
   if (any(!ipkgs)) {
     BiocManager::install(pkgs[!ipkgs])
@@ -53,8 +51,7 @@ suppressMessages(if (!require("BiocManager", character.only = TRUE)) {
   } else {
     message("\n\nCool! your machine has everything is needed.\n\n")
   }
-})
-
+  })
 
 print("Loading required packages...")
 library(pacman)
@@ -63,10 +60,11 @@ pacman::p_loaded()
 
 "Mesothelial Cancer Cell Line Data Analysis (M.C.Li.D.A) Pipeline - Explants
 
-Usage: explants.R --infolder=<folder> --epochs=<value> --max_depth=<value> --eta=<value> --gamma=<value> --colsample_bytree=<value> --min_child_weight=<value> --subsample=<value> --verbose=<value>
+Usage: explants.R --path=<value> --infolder=<folder> --epochs=<value> --max_depth=<value> --eta=<value> --gamma=<value> --colsample_bytree=<value> --min_child_weight=<value> --subsample=<value> --verbose=<value>
 
 Options:
   -h --help                  Show this screen.
+  --path=<value>
   --infolder=<folder>        Folder where the outputs are placed.
   --epochs=<value>           Number of training epochs for the model.
   --max_depth=<value>
@@ -83,26 +81,20 @@ arguments <- docopt(doc, quoted_args = TRUE, help = TRUE)
 print(arguments)
 
 #------------------ Functions
-source("./pipeline/explants_fun.R")
+source("./pipeline/functions.R")
 
 #------------------ Load dataset and parameters into R environment 
-infolder         <- arguments$infolder
-epochs           <- as.numeric(arguments$epochs)
-md               <- as.numeric(arguments$max_depth)
-e                <- as.numeric(arguments$eta)           
-g                <- as.numeric(arguments$gamma)
-csbt             <- as.numeric(arguments$colsample_bytree)
-mcwt             <- as.numeric(arguments$min_child_weight)
-ss               <- as.numeric(arguments$subsample)   
-verbose          <- as.numeric(arguments$verbose)
+infolder          <- arguments$infolder
+path              <- arguments$path 
+epochs            <- as.numeric(arguments$epochs)
+md                <- as.numeric(arguments$max_depth)
+e                 <- as.numeric(arguments$eta)           
+gm                <- as.numeric(arguments$gamma)
+csbt              <- as.numeric(arguments$colsample_bytree)
+mcwt              <- as.numeric(arguments$min_child_weight)
+ss                <- as.numeric(arguments$subsample)   
+verbose           <- as.numeric(arguments$verbose)
 
-files         <- list(cfile = "./datasets/Explants/Clusters.csv",
-                      sfile = "./datasets/Explants/Summary.xlsx" )
-
-
-
-cluster_embed <- load_dataset(files$cfile)
-sensitivity   <- load_dataset(files$sfile)
 mname   <- "XGBoost_explants_logloss.model"
 paths <- list(pdf       = "./outputs/pdf/", 
               models    = "./outputs/models/", 
@@ -110,81 +102,18 @@ paths <- list(pdf       = "./outputs/pdf/",
               r.objects = "./outputs/r-objects/"
 )
 
+files <- list(inputs    = "./datasets/data/inputs.data",
+              labels    = "./datasets/data/labels.data",
+              sid       = "./datasets/data/sid.data",
+              dataframe = "./datasets/data/pipe.data")
 
-#------------------ Connect to MySQL database and extract tables
-details <- read.csv("../../mySQL/con", sep = " ")
-
-c <- dbConnect(MySQL(), user=details$loginu, password=details$loginp, dbname=details$db, host=details$host) # Create connection to a local database server
-
-dbListTables(c) # List tables
-g <- dbGetQuery(c, "SELECT*FROM GainsEXP")
-l <- dbGetQuery(c, "SELECT*FROM LossExp")
-dc <- dbDisconnect(c)
-#explants <- paste0(infolder, "MEDUSA50 DOMAINS - Original file.xlsx")
-
-print(paste0("Project folder path set to: ", wd))
-print(paste0("Extracting inputs from explants and saving sliced results into '", infolder,"'"))
-
-gg  <- g[1:c(nrow(g)-4),] # 
-gs <- g[c(nrow(g)-3):nrow(g),]
-
-lg <- l[1:c(nrow(l)-4),]
-ls <- l[c(nrow(l)-3):nrow(l),]
-
-df <- merge(gg,lg)
-df_deletions <- merge(gs,ls)
-if(length(gg)+length(lg)-2 == length(df)){
-  paste0("Succesefully merged the dataset into a new dataframe with a length of: ", length(df))
-}
-
-#------------------ Include evolutionary trajectory cluster embeds and IC50/logIC50 values
-sensitivity           <- sensitivity$Summary
-sensitivity           <- sensitivity[-9,]
-colnames(sensitivity) <- sensitivity[1,]
-sensitivity           <- sensitivity[-1,]
-# inputs                <- sensitivity[,5:ncol(sensitivity)]
-sensitivity           <- sensitivity[,c(1:4)]
-
-explants_subsample <- sensitivity$Patient
-cluster_embed <- cluster_embed[,-1]
-
-cluster_embed <- cluster_embed[match(explants_subsample, cluster_embed[,1]),]
-colnames(cluster_embed) <- c("sampleID", "Cluster")
-cluster_embed$Cluster <- recode(cluster_embed$Cluster, "C1" = 1, "C2" = 2, "C3" = 3, "C4" = 4, "C5" = 5)
-
-# explants_subsample %in% dataset
-# cleaned <- dataset[match(explants_subsample, dataset[,1]),]
-
-#------------------ Prepare labels
-o <- c("inputs", "sample", "response")
-
-# explants <- sliceDataset(inputs, o[1], genes)
-# sampleID <- sliceDataset(sensitivity, o[2])
-
-sampleID <- explants_subsample
-labels <- list(response = as.numeric(sensitivity$response), 
-               logIC50 = as.numeric(sensitivity$LogIC50), 
-               IC50 = as.numeric(sensitivity$IC50))
-
-#------------------- Prepare Inputs
-match(sampleID, df$`medusa #`)
-df <- df[match(sampleID, df$`medusa #`),]
-inputs <- df[,-c(1,2)] # Slice uneccessary data from the original data frame
-
-
-inputs <- toNumeric(inputs, o[1])
-dataframe <- as.data.frame(cbind(sampleID, 
-                                 labels,
-                                 Evo_Clusters = cluster_embed[,-1], 
-                                 inputs)) # Bind everything together to form the processed dataframe
 pipe.data <- list(
-  inputs    = inputs,
-  labels    = labels,
-  sid       = sampleID,
-  dataframe = dataframe
+  inputs    = readRDS(files$inputs),
+  labels    = readRDS(files$labels),
+  sid       = readRDS(files$sid),
+  dataframe = readRDS(files$dataframe)
 )
-saveRDS(pipe.data$dataframe,paths[1])
-str(pipe.data$dataframe)
+
 #------------------- Create a 70-30% Sample
 set.seed(310)
 qty <- 0.7
