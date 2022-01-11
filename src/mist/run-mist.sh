@@ -20,7 +20,7 @@
 echo Running data preparation for patients...
 
 infolder="./outputs/"
-path=$(dirname "$(realpath IRP-pipeline.sh)")
+path=$(dirname "$(realpath run-mist.sh)")
 echo $path
 
 Rscript ./pipeline/data_process.R --infolder="${infolder}" --path="${path}"
