@@ -18,7 +18,7 @@ min_child_weight=1
 subsample=1
 verbose=0
 
-path=$(dirname "$(realpath IRP-pipeline.sh)")
+path=$(dirname "$(realpath run-explants.sh)")
 echo $path
 
 Rscript ./pipeline/explants.R --path="${path}" --infolder="${infolder}" --epochs="${epochs}" --max_depth=${max_depth} --eta=${eta} --gamma=${gamma} --colsample_bytree=${colsample_bytree} --min_child_weight=${min_child_weight} --subsample=${subsample} --verbose=${verbose}
