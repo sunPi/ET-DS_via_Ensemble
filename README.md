@@ -1,5 +1,5 @@
 # ET-DS_via_EnsembleET-DS_via_Ensemble
-This repository is to track versioning of the research pipeline for exploring evolutionary trajectory-drug sensitivity interactions through ensemble learning method. Currently, XGBoost algorithm is implemented. The algorithm is used to trai and evaluate the model. Following this, it is used to predict. In parallel with training, knowledge that the machine learns is extracted and explained via SHAP values (Explained here: https://github.com/slundberg/shap). The scores measure feature importance across all classs (global explainability) and for each individual class of each feacture (local explainability).
+This repository is to track versioning of the research pipeline for exploring evolutionary trajectory-drug sensitivity interactions through ensemble learning method. Currently, XGBoost algorithm is implemented. The algorithm is used to train and evaluate the model. Following this, it is used to predict. In parallel with training, knowledge that the machine learns is extracted and explained via SHAP values (Explained here: https://github.com/slundberg/shap). The scores measure feature importance across all classs (global explainability) and for each individual class of each feacture (local explainability).
 
 The pipeline:
 
